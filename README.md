@@ -4,4 +4,4 @@ Simple Python script to convert a curl command into a Python script called "curl
 
 Usage:python3 curl2py.py [-r,--raw] 'curl command in single quotes'  
 
-[-r,--raw] - prints raw format instead of the default option of json pretty print
+[-r,--raw] - prints output in raw format instead of the default option of json pretty print
