@@ -45,19 +45,16 @@ def parse_curl(curl_in):
             url="\"" + parse[x].strip("'") + "\""
             host=host_from_url(url)
         x=x+1
-    
     return url,request,host,headers
 
-def main():
-    input,raw=get_input()
-    url,request,host,headers=parse_curl(input)
+def write_out(url,request,host,headers,raw):
     ua="Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MANM; rv:11.0) like Gecko"
     headers["User-Agent"]=ua
     output = open("curl.py",'w')
     output.write("#!/usr/bin/env python3\n\n")
     output.write("import http.client,ssl\n")
     if not raw:
-        output.write("import json,pprint\n\n")
+        output.write("import json,pprint\n")
     output.write("\ndef http_request():\n")
     output.write("\tmethod=\""+ request+"\"\n")
     output.write("\turl="+url+"\n")
@@ -81,6 +78,11 @@ def main():
     output.write("if __name__ == \"__main__\":\n")
     output.write("\tmain()\n")
     output.close()
+
+def main():
+    input,raw=get_input()
+    url,request,host,headers=parse_curl(input)
+    write_out(url,request,host,headers,raw)
 
 if __name__ == "__main__":
     main()
