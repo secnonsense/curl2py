@@ -5,9 +5,10 @@ import shlex
 
 def get_input():
     parser = argparse.ArgumentParser()
+    parser.add_argument("-r", "--raw", help="Use raw instead of json format", action="store_true")
     parser.add_argument("curl", help="Enter a full curl command in quotes")
     args = parser.parse_args()
-    return args.curl
+    return args.curl,args.raw
 
 def host_from_url(url):
     host_split=url.split("/")
@@ -48,14 +49,16 @@ def parse_curl(curl_in):
     return url,request,host,headers
 
 def main():
-    input=get_input()
+    input,raw=get_input()
     url,request,host,headers=parse_curl(input)
     ua="Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MANM; rv:11.0) like Gecko"
     headers["User-Agent"]=ua
     output = open("curl.py",'w')
     output.write("#!/usr/bin/env python3\n\n")
-    output.write("import http.client,json,ssl,pprint\n\n")
-    output.write("def http_request():\n")
+    output.write("import http.client,ssl\n")
+    if not raw:
+        output.write("import json,pprint\n\n")
+    output.write("\ndef http_request():\n")
     output.write("\tmethod=\""+ request+"\"\n")
     output.write("\turl="+url+"\n")
     output.write("\theaders =" + str(headers) + "\n")
@@ -63,12 +66,18 @@ def main():
     output.write("\tconn = http.client.HTTPSConnection(host, context=ssl._create_unverified_context())\n")
     output.write("\tconn.request(method, url, None, headers)\n")
     output.write("\thttpResponse = conn.getresponse()\n")
-    output.write("\tjson_output = json.loads(httpResponse.read())\n")
+    if raw:
+        output.write("\toutput = httpResponse.read()\n")
+    else:
+        output.write("\toutput = json.loads(httpResponse.read())\n")
     output.write("\tconn.close()\n")
-    output.write("\treturn json_output\n\n")
+    output.write("\treturn output\n\n")
     output.write("def main():\n")
-    output.write("\tjson=http_request()\n")
-    output.write("\tpprint.pprint(json)\n\n")
+    output.write("\toutput=http_request()\n")
+    if raw:
+        output.write("\tprint(output)\n\n")
+    else:    
+        output.write("\tpprint.pprint(output)\n\n")
     output.write("if __name__ == \"__main__\":\n")
     output.write("\tmain()\n")
     output.close()
