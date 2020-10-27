@@ -94,7 +94,8 @@ def print_out(url,request,host,headers,data):
     print("The host header is: "+host+"\n")
     print("The full URL is: "+url+"\n")
     print("The headers for the request are: "+ str(headers)+"\n")
-    print("The Post Data is: "+data+"\n")
+    if request.upper()=="POST":
+        print("The Post Data is: "+data+"\n")
 
 def main():
     input,raw=get_input()
