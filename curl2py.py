@@ -6,7 +6,7 @@ import shlex
 def get_input():
     parser = argparse.ArgumentParser()
     parser.add_argument("-r", "--raw", help="Use raw instead of json format", action="store_true")
-    parser.add_argument("curl", help="Enter a full curl command in quotes")
+    parser.add_argument("curl", help="Input a file holding a curl command")
     args = parser.parse_args()
     return args.curl,args.raw
 
@@ -15,13 +15,18 @@ def host_from_url(url):
     host=host_split[2]
     return host
 
+def get_file(input):
+    with open(input, 'r',encoding='utf8') as f:
+        curl = f.read().strip()
+    return curl
+
 def parse_curl(curl_in):
     x=1
     headers={}
     parse=shlex.split(curl_in)
     request="GET"
     if not "curl" in parse[0]:
-        print("input must be a full curl command in quotes")
+        print("input must be a full curl command in a file")
         quit()
     while x < len(parse):
         if "-" in parse[x] and "http" not in parse[x]:
@@ -54,7 +59,7 @@ def parse_curl(curl_in):
 def write_out(url,request,host,headers,raw,data):
     ua="Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; MANM; rv:11.0) like Gecko"
     headers["User-Agent"]=ua
-    output = open("curl.py",'w')
+    output = open("output.py",'w')
     output.write("#!/usr/bin/env python3\n\n")
     output.write("import http.client,ssl\n")
     if not raw or data != "None":
@@ -87,7 +92,7 @@ def write_out(url,request,host,headers,raw,data):
     output.write("if __name__ == \"__main__\":\n")
     output.write("\tmain()\n")
     output.close()
-    print("\nFile curl.py successfully written\n")
+    print("\nFile output.py successfully written\n")
 
 def print_out(url,request,host,headers,data):
     print("The request type is: "+request+"\n")
@@ -99,7 +104,8 @@ def print_out(url,request,host,headers,data):
 
 def main():
     input,raw=get_input()
-    url,request,host,headers,data=parse_curl(input)
+    curl=get_file(input)
+    url,request,host,headers,data=parse_curl(curl)
     write_out(url,request,host,headers,raw,data)
     print_out(url,request,host,headers,data)
 
