@@ -2,6 +2,11 @@
 
 import argparse
 import shlex
+import os
+
+def check_existing():
+    if os.path.exists('output.py'):
+        os.remove('output.py')
 
 def get_input():
     parser = argparse.ArgumentParser()
@@ -15,7 +20,7 @@ def host_from_url(url):
     host=host_split[2]
     return host
 
-def get_file(myinput):
+def get_curl(myinput):
     if not myinput:
         curl=input("Input a curl command: ")
     else:
@@ -95,7 +100,11 @@ def write_out(url,request,host,headers,raw,data):
     output.write("if __name__ == \"__main__\":\n")
     output.write("\tmain()\n")
     output.close()
-    print("\nFile output.py successfully written\n")
+    if os.path.exists('output.py'):
+        print("\nFile output.py successfully written\n")
+    else:
+        print("Error creating file!!!")
+        quit()
 
 def print_out(url,request,host,headers,data):
     print("The request type is: "+request+"\n")
@@ -107,7 +116,8 @@ def print_out(url,request,host,headers,data):
 
 def main():
     input,raw=get_input()
-    curl=get_file(input)
+    check_existing()
+    curl=get_curl(input)
     url,request,host,headers,data=parse_curl(curl)
     write_out(url,request,host,headers,raw,data)
     print_out(url,request,host,headers,data)
