@@ -6,7 +6,7 @@ import shlex
 def get_input():
     parser = argparse.ArgumentParser()
     parser.add_argument("-r", "--raw", help="Use raw instead of json format for output", action="store_true")
-    parser.add_argument("curl", help="Input a file holding a curl command")
+    parser.add_argument("-f","--file",help="Input a file holding a curl command",action="store", dest="curl")
     args = parser.parse_args()
     return args.curl,args.raw
 
@@ -15,9 +15,12 @@ def host_from_url(url):
     host=host_split[2]
     return host
 
-def get_file(input):
-    with open(input, 'r',encoding='utf8') as f:
-        curl = f.read().strip()
+def get_file(myinput):
+    if not myinput:
+        curl=input("Input a curl command: ")
+    else:
+        with open(myinput, 'r',encoding='utf8') as f:
+            curl = f.read().strip()
     return curl
 
 def parse_curl(curl_in):
